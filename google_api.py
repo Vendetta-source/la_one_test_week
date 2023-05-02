@@ -3,6 +3,7 @@ import httplib2
 import apiclient.discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from config import *
+from exceptions import SpreadsheetNotSetError
 
 
 class GoogleAPI:
@@ -144,6 +145,8 @@ class GoogleAPI:
     def add_data(self, data, start_index=1):
         # Добавляем данные по категориям
         # для уменьшения количества запросов
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         try:
             # Получаем id листа по его имени
             sheet_name = data[0]['category'] if data[0]['category'] else 'Лист1'
@@ -225,6 +228,9 @@ class GoogleAPI:
             self.add_data(data)
 
     def add_data_for_rashod(self, data):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
+
         try:
             # Получаем id листа по его имени
             sheet_name = data[0]['category'] if data[0]['category'] else 'Лист1'
@@ -257,6 +263,9 @@ class GoogleAPI:
             self.add_data_for_rashod(data)
 
     def add_row(self, row, sheet_id):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
+
         try:
             cell_value = {
                 'userEnteredValue': {
@@ -326,18 +335,28 @@ class GoogleAPI:
             exit(1)
 
     def share_with_email_for_reading(self, email):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         self.__share({'type': 'user', 'role': 'reader', 'emailAddress': email})
 
     def share_with_email_for_writing(self, email):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         self.__share({'type': 'user', 'role': 'writer', 'emailAddress': email})
 
     def share_with_anybody_for_reading(self):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         self.__share({'type': 'anyone', 'role': 'reader'})
 
     def share_with_anybody_for_writing(self):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         self.__share({'type': 'anyone', 'role': 'writer'})
 
     def get_document_url(self):
+        if not self.spreadsheet:
+            raise SpreadsheetNotSetError
         try:
             return self.spreadsheet['spreadsheetUrl']
         except Exception as ex:
